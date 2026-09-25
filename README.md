@@ -36,6 +36,7 @@ owner, and there are no admins and no shared data.
 - Light and dark themes, a mobile bottom nav with a quick-add button, and forms that open as bottom sheets on phones.
 - `Ctrl/⌘ K` command palette, plus single-key shortcuts: **N** quick add, **E** expense, **I** income, **R** receivable, **P** payable, **S** savings, **T** transfer.
 - "Explore with sample data" creates a private demo sandbox, which is deleted automatically after 2 days.
+- **Switch currency any time** from the top bar, the account menu, the command palette or Settings. You can choose any of about 160 ISO currencies, searchable by name, code or symbol. Only the display currency changes; recorded amounts aren't converted.
 
 ## Project layout
 
@@ -83,6 +84,8 @@ npm test
 | `VITE_API_URL` | client | API base URL if the API is hosted separately (empty = same origin) |
 
 ## Deploying to Vercel
+
+Production deploys automatically from the **`main`** branch.
 
 The repo deploys as **one Vercel project**. The Vite app is served statically
 from `client/dist`, and `/api/*` is rewritten to `api/index.js`, which runs the

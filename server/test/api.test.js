@@ -40,6 +40,17 @@ test('auth: rejects duplicate email, bad password and missing token', async () =
   assert.ok(short.body.fields.password);
 });
 
+test('currency can be switched to any supported ISO code', async () => {
+  const api = as(tokenB);
+  const ok = await api.patch('/api/auth/me', { currency: 'bdt' });
+  assert.equal(ok.status, 200);
+  assert.equal(ok.body.user.currency, 'BDT');
+  assert.equal((await api.get('/api/auth/me')).body.user.currency, 'BDT');
+  const bad = await api.patch('/api/auth/me', { currency: 'XYZ' });
+  assert.equal(bad.status, 400);
+  await api.patch('/api/auth/me', { currency: 'EUR' });
+});
+
 test('new users get default categories and a cash account', async () => {
   const cats = await as(tokenA).get('/api/categories');
   assert.ok(cats.body.length > 10);

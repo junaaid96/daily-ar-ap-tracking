@@ -87,7 +87,7 @@ export default function Dashboard() {
           <p className="text-sm text-muted">{fmtDate(d.today)}</p>
           <h1 className="text-2xl font-bold sm:text-[28px]">{greeting()}, {user?.name?.split(' ')[0]}</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="secondary" icon={ArrowDownLeft} onClick={() => modals.open('due', { direction: 'receivable' })}>Receivable</Button>
           <Button variant="secondary" icon={ArrowUpRight} onClick={() => modals.open('due', { direction: 'payable' })}>Payable</Button>
           <Button icon={Plus} onClick={() => modals.open('transaction', { kind: 'expense' })}>Expense</Button>

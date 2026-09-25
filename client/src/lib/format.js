@@ -1,17 +1,18 @@
-export const CURRENCIES = [
-  ['USD', 'US Dollar'], ['EUR', 'Euro'], ['GBP', 'British Pound'], ['BDT', 'Bangladeshi Taka'], ['INR', 'Indian Rupee'],
-  ['PKR', 'Pakistani Rupee'], ['AED', 'UAE Dirham'], ['SAR', 'Saudi Riyal'], ['MYR', 'Malaysian Ringgit'], ['SGD', 'Singapore Dollar'],
-  ['CAD', 'Canadian Dollar'], ['AUD', 'Australian Dollar'], ['JPY', 'Japanese Yen'], ['CNY', 'Chinese Yuan'], ['NGN', 'Nigerian Naira'],
-  ['KES', 'Kenyan Shilling'], ['IDR', 'Indonesian Rupiah'], ['TRY', 'Turkish Lira'], ['BRL', 'Brazilian Real'], ['ZAR', 'South African Rand'],
-];
-
 let currency = 'USD';
 let fmt;
 let fmtCompact;
 export function setCurrency(code) {
   currency = code || 'USD';
-  fmt = new Intl.NumberFormat(undefined, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  fmtCompact = new Intl.NumberFormat(undefined, { style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1 });
+  const base = { style: 'currency', currency, currencyDisplay: 'narrowSymbol' };
+  try {
+    fmt = new Intl.NumberFormat(undefined, { ...base, minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    fmtCompact = new Intl.NumberFormat(undefined, { ...base, notation: 'compact', maximumFractionDigits: 1 });
+  } catch {
+    // Unknown code or very old browser: fall back to plain USD formatting.
+    currency = 'USD';
+    fmt = new Intl.NumberFormat(undefined, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    fmtCompact = new Intl.NumberFormat(undefined, { style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1 });
+  }
 }
 setCurrency('USD');
 

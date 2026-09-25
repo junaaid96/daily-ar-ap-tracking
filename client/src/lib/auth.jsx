@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
     loading,
     login: (email, password) => api.post('/auth/login', { email, password }).then(finish),
     register: (data) => api.post('/auth/register', data).then(finish),
-    demo: () => api.post('/auth/demo', {}).then(finish),
+    demo: (currency) => api.post('/auth/demo', { currency }).then(finish),
     updateProfile: (data) => api.patch('/auth/me', data).then((r) => { apply(r.user); qc.invalidateQueries(); return r.user; }),
     logout,
   }), [user, loading, finish, logout, apply, qc]);

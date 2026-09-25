@@ -75,8 +75,8 @@ export function Card({ className, children, ...props }) {
 
 export function CardHeader({ title, subtitle, action, icon: IconC }) {
   return (
-    <div className="flex items-start justify-between gap-3 px-5 pt-5">
-      <div className="flex items-center gap-2.5 min-w-0">
+    <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5">
+      <div className="flex min-w-0 flex-1 basis-48 items-center gap-2.5">
         {IconC && <IconC className="size-4 text-muted shrink-0" />}
         <div className="min-w-0">
           <h3 className="font-semibold text-[15px] truncate">{title}</h3>

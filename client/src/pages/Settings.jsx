@@ -1,35 +1,51 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Sun, Moon, Keyboard, ShieldAlert, UserRound, Shapes, Palette } from 'lucide-react';
+import { Plus, Pencil, Trash2, Sun, Moon, Keyboard, ShieldAlert, UserRound, Shapes, Palette, Coins } from 'lucide-react';
 import { toast } from 'sonner';
-import { Card, CardHeader, PageHeader, Button, Field, Input, Select, Segmented, IconButton, CategoryDot, useConfirm } from '../components/ui/index.jsx';
+import { Card, CardHeader, PageHeader, Button, Field, Input, Segmented, IconButton, CategoryDot, useConfirm } from '../components/ui/index.jsx';
+import { CurrencyPickerModal } from '../components/CurrencyPicker.jsx';
+import { currencyName, symbolFor } from '../lib/currencies.js';
 import { useAuth } from '../lib/auth.jsx';
 import { useTheme } from '../lib/theme.js';
 import { useCategories, useSave } from '../lib/queries.js';
 import { useModals } from '../components/ModalHost.jsx';
 import { api } from '../lib/api.js';
-import { CURRENCIES, money } from '../lib/format.js';
+import { money } from '../lib/format.js';
 import { Icon } from '../lib/icons.jsx';
 
 function Profile() {
   const { user, updateProfile } = useAuth();
   const [name, setName] = useState(user.name);
-  const [currency, setCurrency] = useState(user.currency);
   const [busy, setBusy] = useState(false);
   return (
     <Card>
       <CardHeader title="Profile" icon={UserRound} subtitle={user.email} />
-      <form className="grid gap-4 p-5 sm:grid-cols-2" onSubmit={async (e) => {
+      <form className="flex flex-col gap-4 p-5 sm:flex-row sm:items-end" onSubmit={async (e) => {
         e.preventDefault(); setBusy(true);
-        try { await updateProfile({ name, currency }); toast.success('Profile saved'); } catch (err) { toast.error(err.message); } finally { setBusy(false); }
+        try { await updateProfile({ name }); toast.success('Profile saved'); } catch (err) { toast.error(err.message); } finally { setBusy(false); }
       }}>
-        <Field label="Name"><Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} /></Field>
-        <Field label="Currency" hint={`Amounts display like ${money(1234.5)}`}>
-          <Select value={currency} onChange={(e) => setCurrency(e.target.value)}>
-            {CURRENCIES.map(([c, n]) => <option key={c} value={c}>{c} — {n}</option>)}
-          </Select>
-        </Field>
-        <div className="sm:col-span-2 flex justify-end"><Button type="submit" loading={busy} disabled={!name.trim()}>Save profile</Button></div>
+        <Field label="Name" className="flex-1"><Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} /></Field>
+        <Button type="submit" loading={busy} disabled={!name.trim() || name.trim() === user.name}>Save</Button>
       </form>
+    </Card>
+  );
+}
+
+function Currency() {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  return (
+    <Card>
+      <CardHeader title="Currency" icon={Coins} subtitle="Switch any time — used for every amount in the app" />
+      <div className="flex items-center gap-4 p-5">
+        <span className="grid h-12 min-w-12 place-items-center rounded-2xl bg-brand-soft px-2 text-lg font-bold text-brand">{symbolFor(user.currency)}</span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-semibold">{currencyName(user.currency)}</p>
+          <p className="text-sm text-muted">{user.currency} · e.g. <span className="num">{money(1234.5)}</span></p>
+        </div>
+        <Button variant="secondary" onClick={() => setOpen(true)}>Change</Button>
+      </div>
+      <p className="px-5 pb-5 -mt-2 text-xs text-muted">Changing currency updates how amounts are shown; it doesn’t convert amounts you’ve already recorded.</p>
+      <CurrencyPickerModal open={open} onClose={() => setOpen(false)} />
     </Card>
   );
 }
@@ -93,6 +109,7 @@ export default function Settings() {
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="space-y-4">
           <Profile />
+          <Currency />
           <Password />
           <Card>
             <CardHeader title="Appearance" icon={Palette} />

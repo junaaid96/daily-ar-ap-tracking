@@ -36,7 +36,7 @@ export default function App() {
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/" replace /> : <Auth mode="login" />} />
           <Route path="/register" element={user ? <Navigate to="/" replace /> : <Auth mode="register" />} />
-          <Route element={<Protected><ModalHost><AppShell /></ModalHost></Protected>}>
+          <Route element={<Protected><ModalHost key={user?.currency}><AppShell /></ModalHost></Protected>}>
             <Route index element={<Suspense fallback={<Loading />}><Dashboard /></Suspense>} />
             <Route path="daily" element={<Suspense fallback={<Loading />}><Daily /></Suspense>} />
             <Route path="receivables" element={<Suspense fallback={<Loading />}><Dues direction="receivable" /></Suspense>} />

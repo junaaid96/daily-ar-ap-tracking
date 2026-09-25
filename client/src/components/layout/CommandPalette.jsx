@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router';
-import { Search, CornerDownLeft, Moon } from 'lucide-react';
+import { Search, CornerDownLeft, Moon, Coins } from 'lucide-react';
 import { cx, Avatar } from '../ui/index.jsx';
 import { NAV } from './nav.js';
 import { QUICK_ACTIONS } from './QuickAdd.jsx';
@@ -9,7 +9,7 @@ import { useModals } from '../ModalHost.jsx';
 import { useContacts, useGoals } from '../../lib/queries.js';
 import { money } from '../../lib/format.js';
 
-export default function CommandPalette({ open, onClose, toggleTheme }) {
+export default function CommandPalette({ open, onClose, toggleTheme, openCurrency }) {
   const [q, setQ] = useState('');
   const [active, setActive] = useState(0);
   const navigate = useNavigate();
@@ -28,10 +28,11 @@ export default function CommandPalette({ open, onClose, toggleTheme }) {
       ...NAV.map((n) => ({ group: 'Go to', label: n.label, icon: n.icon, run: () => navigate(n.to) })),
       ...contacts.map((c) => ({ group: 'Contacts', label: c.name, sub: c.net ? `${c.net > 0 ? 'owes you' : 'you owe'} ${money(Math.abs(c.net))}` : c.company, avatar: c.name, run: () => navigate(`/contacts/${c.id}`) })),
       { group: 'Preferences', label: 'Toggle dark mode', icon: Moon, run: toggleTheme },
+      { group: 'Preferences', label: 'Change currency', icon: Coins, run: openCurrency },
     ];
     return s ? all.filter((i) => `${i.label} ${i.sub || ''} ${i.group}`.toLowerCase().includes(s)).slice(0, 30)
       : all.filter((i) => i.group !== 'Contacts').concat(all.filter((i) => i.group === 'Contacts').slice(0, 5));
-  }, [q, contacts, goals, modals, navigate, toggleTheme]);
+  }, [q, contacts, goals, modals, navigate, toggleTheme, openCurrency]);
 
   useEffect(() => { listRef.current?.querySelector(`[data-i="${active}"]`)?.scrollIntoView({ block: 'nearest' }); }, [active]);
 

@@ -21,7 +21,10 @@ const limiter = rateLimit({
   message: { error: 'Too many attempts, please try again in a few minutes' },
 });
 
-const currency = z.string().trim().length(3).transform((s) => s.toUpperCase());
+// Any ISO 4217 code the runtime can format (≈160 currencies).
+const SUPPORTED_CURRENCIES = new Set(Intl.supportedValuesOf('currency'));
+const currency = z.string().trim().transform((s) => s.toUpperCase())
+  .refine((c) => SUPPORTED_CURRENCIES.has(c), 'is not a supported currency');
 const publicUser = (u) => ({ id: u.id, name: u.name, email: u.email, currency: u.currency, isDemo: u.is_demo, createdAt: u.created_at });
 
 router.post('/register', limiter, async (req, res) => {
@@ -65,7 +68,7 @@ router.post('/demo', limiter, async (req, res) => {
     const hash = await bcrypt.hash(crypto.randomBytes(24).toString('hex'), 8);
     const { rows: [u] } = await c.query(
       `INSERT INTO users (name, email, password_hash, currency, is_demo) VALUES ('Demo User',$1,$2,$3,true) RETURNING *`,
-      [email, hash, (req.body?.currency || 'USD').toString().slice(0, 3).toUpperCase()],
+      [email, hash, parse(z.object({ currency: currency.default('USD') }), req.body ?? {}).currency],
     );
     await seedDefaults(c, u.id);
     await seedDemoData(c, u.id, today);

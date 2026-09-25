@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { ArrowRight, Eye, EyeOff, HandCoins, PiggyBank, CalendarDays, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button, Field, Input, Select } from '../components/ui/index.jsx';
+import { Button, Field, Input } from '../components/ui/index.jsx';
 import { Logo } from '../components/layout/AppShell.jsx';
 import { useAuth } from '../lib/auth.jsx';
-import { CURRENCIES } from '../lib/format.js';
+import { CurrencySelect } from '../components/CurrencyPicker.jsx';
 
 const guessCurrency = () => {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
@@ -53,7 +53,7 @@ export default function Auth({ mode }) {
 
   const tryDemo = async () => {
     setDemoBusy(true);
-    try { await demo(); toast.success('Loaded a private demo sandbox with sample data'); go(); } catch (err) { toast.error(err.message); } finally { setDemoBusy(false); }
+    try { await demo(form.currency); toast.success('Loaded a private demo sandbox with sample data'); go(); } catch (err) { toast.error(err.message); } finally { setDemoBusy(false); }
   };
 
   return (
@@ -84,9 +84,7 @@ export default function Auth({ mode }) {
             </Field>
             {!isLogin && (
               <Field label="Currency" hint="You can change this later in Settings" htmlFor="currency">
-                <Select id="currency" value={form.currency} onChange={set('currency')}>
-                  {CURRENCIES.map(([c, n]) => <option key={c} value={c}>{c} — {n}</option>)}
-                </Select>
+                <CurrencySelect id="currency" value={form.currency} onChange={set('currency')} />
               </Field>
             )}
             <Button type="submit" size="lg" className="w-full" loading={busy}>

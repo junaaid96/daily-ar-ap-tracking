@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
-import { Plus, Search, Sun, Moon, LogOut, Settings, ArrowDownLeft, ArrowUpRight, FlaskConical } from 'lucide-react';
+import { Plus, Search, Sun, Moon, LogOut, Settings, ArrowDownLeft, ArrowUpRight, FlaskConical, Coins } from 'lucide-react';
 import { cx, IconButton, Menu, Avatar, Button } from '../ui/index.jsx';
 import { NAV, MOBILE_NAV } from './nav.js';
 import QuickAdd, { QUICK_ACTIONS } from './QuickAdd.jsx';
@@ -9,6 +9,7 @@ import { useModals } from '../ModalHost.jsx';
 import { useAuth } from '../../lib/auth.jsx';
 import { useTheme } from '../../lib/theme.js';
 import { useGoals } from '../../lib/queries.js';
+import { CurrencyButton, CurrencyPickerModal } from '../CurrencyPicker.jsx';
 
 export function Logo({ className }) {
   return (
@@ -39,6 +40,7 @@ export default function AppShell() {
   const [dark, toggleTheme] = useTheme();
   const [quick, setQuick] = useState(false);
   const [palette, setPalette] = useState(false);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
   const modals = useModals();
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,6 +93,7 @@ export default function AppShell() {
             </button>
           } items={[
             { label: 'Settings', icon: Settings, onClick: () => navigate('/settings') },
+            { label: `Currency · ${user?.currency}`, icon: Coins, onClick: () => setCurrencyOpen(true) },
             { label: dark ? 'Light mode' : 'Dark mode', icon: dark ? Sun : Moon, onClick: toggleTheme },
             { label: 'Sign out', icon: LogOut, onClick: logout, danger: true },
           ]} />
@@ -108,10 +111,12 @@ export default function AppShell() {
           </button>
           <div className="flex items-center gap-1 lg:ml-auto">
             {user?.isDemo && <span className="hidden items-center gap-1 rounded-full bg-warn-soft px-2.5 py-1 text-xs font-semibold text-warn sm:flex"><FlaskConical className="size-3.5" />Demo sandbox</span>}
+            <CurrencyButton className="hidden sm:flex" />
             <IconButton icon={dark ? Sun : Moon} label="Toggle theme" onClick={toggleTheme} />
             <div className="lg:hidden">
               <Menu trigger={<button className="ml-1 cursor-pointer" aria-label="Account menu"><Avatar name={user?.name} size="sm" /></button>} items={[
                 { label: 'Settings', icon: Settings, onClick: () => navigate('/settings') },
+                { label: `Currency · ${user?.currency}`, icon: Coins, onClick: () => setCurrencyOpen(true) },
                 ...NAV.filter((n) => !MOBILE_NAV.includes(n.to) && n.to !== '/settings').map((n) => ({ label: n.label, icon: n.icon, onClick: () => navigate(n.to) })),
                 { label: 'Sign out', icon: LogOut, onClick: logout, danger: true },
               ]} />
@@ -144,7 +149,8 @@ export default function AppShell() {
       </nav>
 
       <QuickAdd open={quick} onClose={() => setQuick(false)} />
-      <CommandPalette open={palette} onClose={() => setPalette(false)} toggleTheme={toggleTheme} />
+      <CurrencyPickerModal open={currencyOpen} onClose={() => setCurrencyOpen(false)} />
+      <CommandPalette open={palette} onClose={() => setPalette(false)} toggleTheme={toggleTheme} openCurrency={() => setCurrencyOpen(true)} />
     </div>
   );
 }
