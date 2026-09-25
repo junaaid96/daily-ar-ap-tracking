@@ -48,7 +48,9 @@ function StatsStrip({ stats }) {
       <div className="rounded-2xl border border-line bg-surface p-3">
         <p className="flex items-center gap-1.5 text-xs text-muted"><Users className="size-3.5" />Registered users</p>
         <p className="mt-0.5 text-xl font-bold num">{stats ? fmtCount(stats.users) : <span className="inline-block h-6 w-12 animate-pulse rounded bg-surface-2 align-middle" />}</p>
-        <p className="text-[11px] text-muted">{stats?.users === 1 ? 'person tracks' : 'people track'} their money here</p>
+        <p className="text-[11px] text-muted">
+          {stats?.users === 0 ? 'be the first to sign up' : `${stats?.users === 1 ? 'person tracks' : 'people track'} their money here`}
+        </p>
       </div>
       <div className="rounded-2xl border border-line bg-surface p-3">
         <p className="flex items-center gap-1.5 text-xs text-muted"><Globe className="size-3.5" />Currencies supported</p>
