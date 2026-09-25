@@ -2,6 +2,7 @@
   "name": "ledgerly",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "description": "Ledgerly — accounts receivable & payable, daily expenses, budgets and savings tracker (React + Express + Neon Postgres)",
   "workspaces": ["server", "client"],
   "scripts": {
