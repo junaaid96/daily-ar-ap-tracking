@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { ArrowRight, Eye, EyeOff, HandCoins, PiggyBank, CalendarDays, ShieldCheck, Sparkles, TrendingUp, Users, Globe } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, HandCoins, PiggyBank, CalendarDays, ShieldCheck, TrendingUp, Users, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button, Field, Input } from '../components/ui/index.jsx';
 import { Logo } from '../components/layout/AppShell.jsx';
@@ -87,13 +87,12 @@ function CurrencyMarquee() {
 
 export default function Auth({ mode }) {
   const isLogin = mode === 'login';
-  const { login, register, demo } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [form, setForm] = useState({ name: '', email: '', password: '', currency: guessCurrency() });
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
-  const [demoBusy, setDemoBusy] = useState(false);
   const [show, setShow] = useState(false);
   const stats = useStats();
   const set = (k) => (e) => { setForm((f) => ({ ...f, [k]: e.target.value })); setErrors((x) => ({ ...x, [k]: undefined })); };
@@ -111,11 +110,6 @@ export default function Auth({ mode }) {
       setErrors(err.fields || {});
       toast.error(err.message);
     } finally { setBusy(false); }
-  };
-
-  const tryDemo = async () => {
-    setDemoBusy(true);
-    try { await demo(form.currency); toast.success('Loaded a private demo sandbox with sample data'); go(); } catch (err) { toast.error(err.message); } finally { setDemoBusy(false); }
   };
 
   return (
@@ -154,8 +148,6 @@ export default function Auth({ mode }) {
               {isLogin ? 'Sign in' : 'Create account'} <ArrowRight className="size-4" />
             </Button>
           </form>
-          <div className="my-6 flex items-center gap-3 text-xs text-muted"><span className="h-px flex-1 bg-line" />or<span className="h-px flex-1 bg-line" /></div>
-          <Button variant="secondary" size="lg" className="w-full" icon={Sparkles} loading={demoBusy} onClick={tryDemo}>Explore with sample data</Button>
           <p className="mt-8 text-center text-sm text-muted">
             {isLogin ? 'New to Ledgerly? ' : 'Already have an account? '}
             <Link to={isLogin ? '/register' : '/login'} state={location.state} className="font-semibold text-brand hover:underline">

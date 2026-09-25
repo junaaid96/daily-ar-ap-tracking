@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
-import crypto from 'node:crypto';
 import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { one, tx } from '../db/pool.js';
@@ -8,8 +7,6 @@ import { parse } from '../lib/validate.js';
 import { HttpError } from '../lib/errors.js';
 import { signToken, requireAuth } from '../middleware/auth.js';
 import { seedDefaults } from '../lib/defaults.js';
-import { seedDemoData } from '../db/demo.js';
-import { todayIn } from '../lib/dates.js';
 
 const router = Router();
 
@@ -56,25 +53,6 @@ router.post('/login', limiter, async (req, res) => {
   const ok = user && (await bcrypt.compare(body.password, user.password_hash));
   if (!ok) throw new HttpError(401, 'Incorrect email or password');
   res.json({ token: signToken(user), user: publicUser(user) });
-});
-
-// One-click sandbox: a throwaway account pre-filled with realistic data.
-router.post('/demo', limiter, async (req, res) => {
-  const today = todayIn(req.get('x-timezone') || 'UTC');
-  // Sandboxes are disposable: clear out ones older than two days.
-  await one(`DELETE FROM users WHERE is_demo AND created_at < now() - interval '2 days'`);
-  const user = await tx(async (c) => {
-    const email = `demo-${crypto.randomBytes(5).toString('hex')}@demo.ledgerly.app`;
-    const hash = await bcrypt.hash(crypto.randomBytes(24).toString('hex'), 8);
-    const { rows: [u] } = await c.query(
-      `INSERT INTO users (name, email, password_hash, currency, is_demo) VALUES ('Demo User',$1,$2,$3,true) RETURNING *`,
-      [email, hash, parse(z.object({ currency: currency.default('USD') }), req.body ?? {}).currency],
-    );
-    await seedDefaults(c, u.id);
-    await seedDemoData(c, u.id, today);
-    return u;
-  });
-  res.status(201).json({ token: signToken(user), user: publicUser(user) });
 });
 
 router.get('/me', requireAuth, async (req, res) => {

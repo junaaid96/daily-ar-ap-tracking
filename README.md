@@ -35,7 +35,6 @@ owner, and there are no admins and no shared data.
 **UX**
 - Light and dark themes, a mobile bottom nav with a quick-add button, and forms that open as bottom sheets on phones.
 - `Ctrl/⌘ K` command palette, plus single-key shortcuts: **N** quick add, **E** expense, **I** income, **R** receivable, **P** payable, **S** savings, **T** transfer.
-- "Explore with sample data" creates a private demo sandbox, which is deleted automatically after 2 days.
 - **Switch currency any time** from the top bar, the account menu, the command palette or Settings. You can choose any of about 160 ISO currencies, searchable by name, code or symbol. Only the display currency changes; recorded amounts aren't converted.
 
 ## Project layout
@@ -102,7 +101,7 @@ Clients send `X-Timezone` so that "today", overdue checks and aging match the us
 
 | Resource | Endpoints |
 |---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/demo`, `GET/PATCH/DELETE /auth/me`, `POST /auth/password` |
+| Auth | `POST /auth/register`, `POST /auth/login`, `GET/PATCH/DELETE /auth/me`, `POST /auth/password` |
 | Receivables/payables | `GET/POST /dues`, `GET/PATCH/DELETE /dues/:id`, `POST /dues/:id/payments`, `POST /dues/:id/settle`, `DELETE /dues/:id/payments/:pid`, `GET /dues/aging` |
 | Contacts | `GET/POST /contacts`, `GET/PATCH/DELETE /contacts/:id` (includes statement) |
 | Transactions | `GET/POST /transactions`, `PATCH/DELETE /transactions/:id`, `GET /transactions/export.csv`, `GET /transactions/suggestions` |
