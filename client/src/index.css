@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --line: #e4e7ec;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --brand: #0f766e;
+  --brand-soft: #ccfbf1;
+  --in: #059669;       /* money coming to you: receivables, income */
+  --in-soft: #d1fae5;
+  --out: #e11d48;      /* money leaving: payables, expenses */
+  --out-soft: #ffe4e6;
+  --save: #7c3aed;
+  --save-soft: #ede9fe;
+  --warn: #d97706;
+  --warn-soft: #fef3c7;
+  --ring: rgba(15, 118, 110, 0.35);
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0b0f14;
+  --surface: #121821;
+  --surface-2: #1a222d;
+  --line: #243040;
+  --ink: #e6edf5;
+  --muted: #8b9bb0;
+  --brand: #2dd4bf;
+  --brand-soft: rgba(45, 212, 191, 0.14);
+  --in: #34d399;
+  --in-soft: rgba(52, 211, 153, 0.14);
+  --out: #fb7185;
+  --out-soft: rgba(251, 113, 133, 0.14);
+  --save: #a78bfa;
+  --save-soft: rgba(167, 139, 250, 0.16);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.14);
+  --ring: rgba(45, 212, 191, 0.4);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-in: var(--in);
+  --color-in-soft: var(--in-soft);
+  --color-out: var(--out);
+  --color-out-soft: var(--out-soft);
+  --color-save: var(--save);
+  --color-save-soft: var(--save-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --shadow-card: var(--shadow);
+}
+
+@layer base {
+  html, body, #root { min-height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+  ::selection { background: var(--brand-soft); }
+  input[type="date"]::-webkit-calendar-picker-indicator { opacity: .6; cursor: pointer; }
+  .dark input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+}
+
+@layer components {
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; box-shadow: var(--shadow-card); }
+  .num { font-variant-numeric: tabular-nums; }
+  .input {
+    width: 100%; height: 2.5rem; border-radius: .625rem; border: 1px solid var(--line); background: var(--surface);
+    padding: 0 .75rem; font-size: .9rem; color: var(--ink); transition: border-color .15s, box-shadow .15s;
+  }
+  .input::placeholder { color: var(--muted); opacity: .7; }
+  .input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--ring); }
+  .input[aria-invalid="true"] { border-color: var(--out); }
+  textarea.input { height: auto; padding: .6rem .75rem; min-height: 4.5rem; resize: vertical; }
+  select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2364748b' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .6rem center; padding-right: 2rem; }
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+}
+
+@keyframes pop-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.animate-pop { animation: pop-in .18s ease-out; }
+.animate-sheet { animation: sheet-in .22s cubic-bezier(.2,.8,.2,1); }
+.animate-fade { animation: fade-in .15s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop, .animate-sheet, .animate-fade { animation: none; }
+}

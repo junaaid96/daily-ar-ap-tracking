@@ -1,0 +1,20 @@
+{
+  "name": "ledgerly",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Ledgerly — accounts receivable & payable, daily expenses, budgets and savings tracker (React + Express + Neon Postgres)",
+  "workspaces": ["server", "client"],
+  "scripts": {
+    "dev": "concurrently -n api,web -c teal,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm start -w server",
+    "migrate": "npm run migrate -w server",
+    "seed": "npm run seed -w server",
+    "test": "npm test -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  },
+  "engines": { "node": ">=20.6" },
+  "license": "MIT"
+}
