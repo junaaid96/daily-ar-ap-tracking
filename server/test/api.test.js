@@ -198,6 +198,13 @@ test('dashboard and reports respond with the expected shape', async () => {
   }
 });
 
+test('public stats count real users only and list supported currencies', async () => {
+  const res = await request(app).get('/api/stats');
+  assert.equal(res.status, 200);
+  assert.equal(res.body.users, 2); // Alice and Bob; demo sandboxes are excluded
+  assert.ok(res.body.currencies > 100);
+});
+
 test('demo sandbox login is seeded with data', async () => {
   const res = await request(app).post('/api/auth/demo').set('x-timezone', 'UTC').send({});
   assert.equal(res.status, 201);

@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { ArrowRight, Eye, EyeOff, HandCoins, PiggyBank, CalendarDays, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, HandCoins, PiggyBank, CalendarDays, ShieldCheck, Sparkles, TrendingUp, Users, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button, Field, Input } from '../components/ui/index.jsx';
 import { Logo } from '../components/layout/AppShell.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { CurrencySelect } from '../components/CurrencyPicker.jsx';
+import { api } from '../lib/api.js';
+import { allCurrencies, POPULAR, symbolFor } from '../lib/currencies.js';
 
 const guessCurrency = () => {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
@@ -24,6 +26,63 @@ const FEATURES = [
   { icon: TrendingUp, title: '30-day cash forecast', body: 'Upcoming bills, dues and income projected onto your balance.' },
 ];
 
+
+function useStats() {
+  const [stats, setStats] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    api.get('/stats').then((s) => alive && setStats(s)).catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return stats;
+}
+
+const fmtCount = (n) => new Intl.NumberFormat().format(n);
+
+/** "1,204 people track their money here · 162 currencies supported" */
+function StatsStrip({ stats }) {
+  const currencyCount = stats?.currencies || allCurrencies().length;
+  const symbols = useMemo(() => [...new Set(POPULAR.map(symbolFor))].slice(0, 6), []);
+  return (
+    <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="rounded-2xl border border-line bg-surface p-3">
+        <p className="flex items-center gap-1.5 text-xs text-muted"><Users className="size-3.5" />Registered users</p>
+        <p className="mt-0.5 text-xl font-bold num">{stats ? fmtCount(stats.users) : <span className="inline-block h-6 w-12 animate-pulse rounded bg-surface-2 align-middle" />}</p>
+        <p className="text-[11px] text-muted">{stats?.users === 1 ? 'person tracks' : 'people track'} their money here</p>
+      </div>
+      <div className="rounded-2xl border border-line bg-surface p-3">
+        <p className="flex items-center gap-1.5 text-xs text-muted"><Globe className="size-3.5" />Currencies supported</p>
+        <p className="mt-0.5 text-xl font-bold num">{currencyCount}</p>
+        <p className="truncate text-[11px] text-muted" aria-label="Including taka, dollar, euro, pound, rupee and more">{symbols.slice(0, 5).join(' ')} and more</p>
+      </div>
+    </div>
+  );
+}
+
+/** Slowly scrolling row of currency symbols for the brand panel. */
+function CurrencyMarquee() {
+  const items = useMemo(() => {
+    const all = allCurrencies();
+    const popular = POPULAR.map((c) => all.find((x) => x.code === c)).filter(Boolean);
+    const rest = all.filter((c) => !POPULAR.includes(c.code) && c.symbol !== c.code).slice(0, 26);
+    return [...popular, ...rest];
+  }, []);
+  const row = (hidden) => (
+    <div className="flex shrink-0 gap-2 pr-2" aria-hidden={hidden || undefined}>
+      {items.map((c) => (
+        <span key={c.code} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs whitespace-nowrap">
+          <b className="text-teal-100">{c.symbol}</b><span className="text-teal-200/80">{c.code}</span>
+        </span>
+      ))}
+    </div>
+  );
+  return (
+    <div className="relative mt-3 flex overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
+      <div className="flex animate-[marquee_60s_linear_infinite] motion-reduce:animate-none">{row(false)}{row(true)}</div>
+    </div>
+  );
+}
+
 export default function Auth({ mode }) {
   const isLogin = mode === 'login';
   const { login, register, demo } = useAuth();
@@ -34,6 +93,7 @@ export default function Auth({ mode }) {
   const [busy, setBusy] = useState(false);
   const [demoBusy, setDemoBusy] = useState(false);
   const [show, setShow] = useState(false);
+  const stats = useStats();
   const set = (k) => (e) => { setForm((f) => ({ ...f, [k]: e.target.value })); setErrors((x) => ({ ...x, [k]: undefined })); };
   const go = () => navigate(location.state?.from || '/', { replace: true });
 
@@ -63,6 +123,7 @@ export default function Auth({ mode }) {
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
           <h1 className="text-3xl font-extrabold">{isLogin ? 'Welcome back' : 'Create your account'}</h1>
           <p className="mt-2 text-muted">{isLogin ? 'Sign in to see where your money stands today.' : 'Free, private, and yours alone. Takes 20 seconds.'}</p>
+          <StatsStrip stats={stats} />
           <form onSubmit={submit} className="mt-8 space-y-4">
             {!isLogin && (
               <Field label="Your name" error={errors.name} htmlFor="name">
@@ -117,6 +178,11 @@ export default function Auth({ mode }) {
               <div className="rounded-2xl bg-white/5 p-3"><p className="text-teal-200">To pay</p><p className="mt-1 text-base font-semibold num">$687</p></div>
               <div className="rounded-2xl bg-white/5 p-3"><p className="text-teal-200">Saved</p><p className="mt-1 text-base font-semibold num">$2,480</p></div>
             </div>
+          </div>
+          <div className="mt-8">
+            <p className="flex items-center gap-2 font-semibold"><Globe className="size-5 text-teal-200" />Works in your currency: {stats?.currencies || allCurrencies().length} currencies supported</p>
+            <p className="mt-1 text-sm text-teal-100/80">Taka, rupee, dollar, euro, dirham… pick yours at sign-up and switch any time.</p>
+            <CurrencyMarquee />
           </div>
           <div className="mt-8 grid grid-cols-2 gap-5">
             {FEATURES.map((f) => (

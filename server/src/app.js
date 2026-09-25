@@ -36,6 +36,18 @@ export function createApp() {
     res.json({ ok: true, db: 'up', time: r.time });
   });
 
+  // Public numbers for the sign-in page. Cached briefly so it can't hammer the DB.
+  const CURRENCY_COUNT = Intl.supportedValuesOf('currency').length;
+  let statsCache = { at: 0, users: 0 };
+  app.get('/api/stats', async (_req, res) => {
+    if (Date.now() - statsCache.at > 60_000) {
+      const { rows: [r] } = await pool.query('SELECT COUNT(*)::int AS users FROM users WHERE NOT is_demo');
+      statsCache = { at: Date.now(), users: r.users };
+    }
+    res.set('Cache-Control', 'public, max-age=60');
+    res.json({ users: statsCache.users, currencies: CURRENCY_COUNT });
+  });
+
   app.use('/api/auth', clientToday, auth);
 
   const api = express.Router();

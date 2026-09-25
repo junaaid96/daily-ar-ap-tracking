@@ -102,6 +102,7 @@
 
 @keyframes pop-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
 @keyframes sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 .animate-pop { animation: pop-in .18s ease-out; }
 .animate-sheet { animation: sheet-in .22s cubic-bezier(.2,.8,.2,1); }
