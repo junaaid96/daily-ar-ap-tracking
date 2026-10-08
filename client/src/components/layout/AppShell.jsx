@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { Plus, Search, Sun, Moon, LogOut, Settings, ArrowDownLeft, ArrowUpRight, FlaskConical, Coins } from 'lucide-react';
-import { cx, IconButton, Menu, Avatar, Button } from '../ui/index.jsx';
+import { cx, IconButton, Menu, Avatar, Button, DeveloperCredit } from '../ui/index.jsx';
 import { NAV, MOBILE_NAV } from './nav.js';
 import QuickAdd, { QUICK_ACTIONS } from './QuickAdd.jsx';
 import CommandPalette from './CommandPalette.jsx';
@@ -97,6 +97,12 @@ export default function AppShell() {
             { label: dark ? 'Light mode' : 'Dark mode', icon: dark ? Sun : Moon, onClick: toggleTheme },
             { label: 'Sign out', icon: LogOut, onClick: logout, danger: true },
           ]} />
+          <button type="button" onClick={logout}
+            className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-2 hover:text-out cursor-pointer">
+            <LogOut className="size-[18px]" aria-hidden />
+            Sign out
+          </button>
+          <DeveloperCredit className="mt-4 border-t border-line pt-3" />
         </div>
       </aside>
 

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { ArrowRight, Eye, EyeOff, HandCoins, PiggyBank, CalendarDays, ShieldCheck, TrendingUp, Users, Globe } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button, Field, Input } from '../components/ui/index.jsx';
+import { Button, Field, Input, DeveloperCredit } from '../components/ui/index.jsx';
 import { Logo } from '../components/layout/AppShell.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { CurrencySelect } from '../components/CurrencyPicker.jsx';
@@ -156,6 +156,7 @@ export default function Auth({ mode }) {
           </p>
         </div>
         <p className="flex items-center justify-center gap-1.5 text-xs text-muted"><ShieldCheck className="size-3.5" />Every account's data is private. No admins, no sharing.</p>
+        <DeveloperCredit className="mt-3" />
       </div>
 
       <div className="relative hidden overflow-hidden bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 p-12 text-white lg:flex lg:flex-col lg:justify-center">

@@ -1,7 +1,7 @@
 import { createContext, forwardRef, useCallback, useContext, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
-import { X, LoaderCircle, Inbox } from 'lucide-react';
+import { X, LoaderCircle, Inbox, CodeXml } from 'lucide-react';
 import { money, initials, avatarColor } from '../../lib/format.js';
 
 export const cx = clsx;
@@ -200,6 +200,24 @@ export function PageHeader({ title, subtitle, actions, children }) {
 }
 
 export const Spinner = ({ className }) => <LoaderCircle className={cx('size-5 animate-spin text-muted', className)} />;
+
+export function DeveloperCredit({ className }) {
+  return (
+    <a
+      href="https://junaidul.pro.bd/codejborg"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Developed by CodeJBorg — visit developer website"
+      className={cx('flex items-center justify-center gap-1.5 font-mono text-[11px] text-muted transition-colors hover:text-ink', className)}
+    >
+      <CodeXml className="size-3.5" aria-hidden />
+      <span>Developed by</span>
+      <span className="font-semibold text-ink">
+        <span className="text-brand">&lt;</span>CodeJBorg<span className="text-brand"> /&gt;</span>
+      </span>
+    </a>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Modal: centered dialog on desktop, bottom sheet on phones.
