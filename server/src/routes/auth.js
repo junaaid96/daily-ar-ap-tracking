@@ -88,6 +88,8 @@ router.post('/password', requireAuth, limiter, async (req, res) => {
 });
 
 router.delete('/me', requireAuth, async (req, res) => {
+  const user = await one('SELECT is_demo FROM users WHERE id = $1', [req.userId]);
+  if (user?.is_demo) throw new HttpError(400, 'Demo accounts cannot be deleted');
   await one('DELETE FROM users WHERE id = $1', [req.userId]);
   res.status(204).end();
 });

@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { ArrowRight, Eye, EyeOff, HandCoins, PiggyBank, CalendarDays, ShieldCheck, TrendingUp, Users, Globe } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, HandCoins, PiggyBank, CalendarDays, ShieldCheck, TrendingUp, Users, Globe, FlaskConical, UserRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button, Field, Input, DeveloperCredit } from '../components/ui/index.jsx';
 import { Logo } from '../components/layout/AppShell.jsx';
 import { useAuth } from '../lib/auth.jsx';
+
 import { CurrencySelect } from '../components/CurrencyPicker.jsx';
 import { api } from '../lib/api.js';
 import { allCurrencies, POPULAR, symbolFor } from '../lib/currencies.js';
+
+const DEMO_EMAIL = 'demo@ledgerly.app';
+const DEMO_PASSWORD = 'demo1234';
 
 const guessCurrency = () => {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
@@ -98,6 +102,18 @@ export default function Auth({ mode }) {
   const set = (k) => (e) => { setForm((f) => ({ ...f, [k]: e.target.value })); setErrors((x) => ({ ...x, [k]: undefined })); };
   const go = () => navigate(location.state?.from || '/', { replace: true });
 
+  const tryDemo = async () => {
+    setForm((f) => ({ ...f, email: DEMO_EMAIL, password: DEMO_PASSWORD }));
+    setBusy(true);
+    try {
+      await login(DEMO_EMAIL, DEMO_PASSWORD);
+      toast.success('Welcome to the Ledgerly demo!');
+      go();
+    } catch (err) {
+      toast.error(err.message);
+    } finally { setBusy(false); }
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
@@ -148,6 +164,15 @@ export default function Auth({ mode }) {
               {isLogin ? 'Sign in' : 'Create account'} <ArrowRight className="size-4" />
             </Button>
           </form>
+          {isLogin && (
+            <div className="mt-6 rounded-2xl border border-dashed border-line p-4">
+              <p className="flex items-center gap-2 text-sm font-semibold"><FlaskConical className="size-4 text-brand" />Explore the demo</p>
+              <p className="mt-1 text-xs text-muted">One click signs you in to a sandbox with 3 months of sample data. Password: <code className="font-mono">{DEMO_PASSWORD}</code></p>
+              <Button type="button" variant="secondary" className="mt-3 w-full gap-2" disabled={busy} onClick={tryDemo}>
+                <UserRound className="size-4" />Demo user
+              </Button>
+            </div>
+          )}
           <p className="mt-8 text-center text-sm text-muted">
             {isLogin ? 'New to Ledgerly? ' : 'Already have an account? '}
             <Link to={isLogin ? '/register' : '/login'} state={location.state} className="font-semibold text-brand hover:underline">
