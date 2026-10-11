@@ -7,6 +7,8 @@ import { parse } from '../lib/validate.js';
 import { HttpError } from '../lib/errors.js';
 import { signToken, requireAuth } from '../middleware/auth.js';
 import { seedDefaults } from '../lib/defaults.js';
+import { todayIn } from '../lib/dates.js';
+import { DEMO_EMAIL, DEMO_PASSWORD, ensureDemoUser } from '../db/demo.js';
 
 const router = Router();
 
@@ -32,6 +34,7 @@ router.post('/register', limiter, async (req, res) => {
     currency: currency.default('USD'),
   }), req.body);
 
+  if (body.email === DEMO_EMAIL) throw new HttpError(409, 'That email is reserved for the demo account');
   const exists = await one('SELECT 1 FROM users WHERE lower(email) = $1', [body.email]);
   if (exists) throw new HttpError(409, 'An account with this email already exists');
 
@@ -49,6 +52,9 @@ router.post('/register', limiter, async (req, res) => {
 
 router.post('/login', limiter, async (req, res) => {
   const body = parse(z.object({ email: z.string().trim().toLowerCase(), password: z.string() }), req.body);
+  if (body.email === DEMO_EMAIL && body.password === DEMO_PASSWORD) {
+    await ensureDemoUser({ tx, bcrypt, seedDefaults, todayIn });
+  }
   const user = await one('SELECT * FROM users WHERE lower(email) = $1', [body.email]);
   const ok = user && (await bcrypt.compare(body.password, user.password_hash));
   if (!ok) throw new HttpError(401, 'Incorrect email or password');

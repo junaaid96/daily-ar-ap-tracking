@@ -145,3 +145,27 @@ export async function seedDemoData(c, userId, today) {
     }
   }
 }
+
+// Public demo login behind the "Explore the demo" button on the login page.
+export const DEMO_EMAIL = 'demo@ledgerly.app';
+export const DEMO_PASSWORD = 'demo1234';
+const DEMO_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Make sure the shared demo account exists with fresh sample data. Called on a demo
+ * login, so no deploy step or DB access is needed. The sandbox is rebuilt once it is
+ * older than a day (a built-in nightly reset). Never touches a non-demo account.
+ */
+export async function ensureDemoUser({ tx, bcrypt, seedDefaults, todayIn }) {
+  await tx(async (c) => {
+    await c.query('SELECT pg_advisory_xact_lock(424242)');
+    const { rows: [u] } = await c.query('SELECT id, is_demo, created_at FROM users WHERE lower(email) = $1', [DEMO_EMAIL]);
+    if (u && (!u.is_demo || Date.now() - new Date(u.created_at).getTime() < DEMO_MAX_AGE_MS)) return;
+    if (u) await c.query('DELETE FROM users WHERE id = $1', [u.id]);
+    const { rows: [nu] } = await c.query(
+      `INSERT INTO users (name, email, password_hash, currency, is_demo) VALUES ('Demo User', $1, $2, 'USD', true) RETURNING id`,
+      [DEMO_EMAIL, await bcrypt.hash(DEMO_PASSWORD, 10)]);
+    await seedDefaults(c, nu.id);
+    await seedDemoData(c, nu.id, todayIn('UTC'));
+  });
+}
