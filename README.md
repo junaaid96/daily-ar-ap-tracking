@@ -33,7 +33,7 @@ owner, and there are no admins and no shared data.
 - Reports: income vs expenses, category breakdown, a spending calendar heatmap, spending by weekday, and collections vs repayments.
 
 **UX**
-- Light and dark themes, a mobile bottom nav with a quick-add button, and forms that open as bottom sheets on phones.
+- A mobile bottom nav with a quick-add button, and forms that open as bottom sheets on phones.
 - `Ctrl/⌘ K` command palette, plus single-key shortcuts: **N** quick add, **E** expense, **I** income, **R** receivable, **P** payable, **S** savings, **T** transfer.
 - **Switch currency any time** from the top bar, the account menu, the command palette or Settings. You can choose any of about 160 ISO currencies, searchable by name, code or symbol. Only the display currency changes; recorded amounts aren't converted.
 
